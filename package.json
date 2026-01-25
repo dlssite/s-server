@@ -1,0 +1,26 @@
+{
+    "name": "sanctyr-core-app-server",
+    "version": "1.0.0",
+    "description": "Backend for Sanctyr Core App",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "dev": "nodemon index.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "axios": "^1.13.2",
+        "cookie-parser": "^1.4.7",
+        "cors": "^2.8.6",
+        "dotenv": "^16.6.1",
+        "express": "^4.22.1",
+        "http-proxy-middleware": "^3.0.5",
+        "jsonwebtoken": "^9.0.3",
+        "mongoose": "^8.21.1"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.11"
+    }
+}
