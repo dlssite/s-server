@@ -19,27 +19,58 @@ const PORT = process.env.PORT || 3001;
 
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
-// Global Middleware (Stream Safe)
+// Parse ALLOWED_ORIGINS into array
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+    : ['http://localhost:5173'];
+
+// Global Middleware
 app.use(cors({
-    origin: process.env.ALLOWED_ORIGINS || 'http://localhost:5173',
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps, Postman, etc.)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            console.warn(`[CORS] Blocked origin: ${origin}`);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true
 }));
 
-// Specific Auth Overrides (Handles its own body parsing)
+// Cookie parser must be global for refresh token to work
+app.use(cookieParser());
+
+// Specific Auth Overrides (Handles its own body parsing for register)
 app.use('/api/auth', authRoutes);
 
-// Proxy Auth Requests (Processes raw stream)
+// Proxy Auth Requests (Processes raw stream) - Must come AFTER custom routes
 app.use('/api/auth', createProxyMiddleware({
     target: process.env.AUTH_SERVICE_URL || 'http://localhost:4000',
     changeOrigin: true,
     logLevel: 'debug',
     pathRewrite: {
-        '^/api/auth/': '/api/v1/auth/'
+        '^/api/auth': '/api/v1/auth'
+    },
+    onProxyReq: (proxyReq, req, res) => {
+        // Forward cookies to auth service
+        if (req.headers.cookie) {
+            proxyReq.setHeader('cookie', req.headers.cookie);
+        }
+    },
+    onProxyRes: (proxyRes, req, res) => {
+        // Forward set-cookie headers from auth service
+        const setCookie = proxyRes.headers['set-cookie'];
+        if (setCookie) {
+            res.setHeader('set-cookie', setCookie);
+        }
     }
 }));
 
 // Routes
-app.use('/api', express.json(), cookieParser(), dashboardRoutes);
+app.use('/api', express.json(), dashboardRoutes);
 app.use('/api/profiles', express.json(), profileRoutes);
 
 // Test Route
