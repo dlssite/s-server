@@ -52,7 +52,7 @@ app.use('/api/auth', createProxyMiddleware({
     changeOrigin: true,
     logLevel: 'debug',
     pathRewrite: {
-        '^/api/auth': '/api/v1/auth'
+        '^/': '/api/v1/auth/' // Prepend /api/v1/auth/ to the relative path
     },
     onProxyReq: (proxyReq, req, res) => {
         // Forward cookies to auth service
