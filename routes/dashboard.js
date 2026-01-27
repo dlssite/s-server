@@ -157,6 +157,8 @@ router.get('/me', verifyToken, async (req, res) => {
                 roles: serverStats?.roles || [],
                 level: serverStats?.leveling?.level || 1,
                 streak: serverStats?.economy?.streak || 0,
+                weeklyXp: serverStats?.leveling?.weeklyXp || 0,
+                totalXp: serverStats?.leveling?.totalXp || 0,
                 messages: serverStats?.leveling?.messages || 0,
                 voiceMinutes: serverStats?.leveling?.voiceMinutes || 0,
                 attachmentCount: serverStats?.leveling?.attachmentCount || 0,

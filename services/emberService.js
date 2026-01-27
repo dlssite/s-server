@@ -189,11 +189,13 @@ const getRealtimeServerStats = async (discordId) => {
             economy: {
                 wallet: economy?.wallet || 0,
                 bank: economy?.bank || 0,
-                streak: economy?.dailyStreak || 0
+                streak: leveling?.streaks?.daily || economy?.dailyStreak || 0
             },
             leveling: {
                 level: leveling?.level || 1,
                 xp: leveling?.xp || 0,
+                weeklyXp: leveling?.weeklyXp || 0,
+                totalXp: leveling?.totalXp || 0,
                 messages: leveling?.messageCount || 0,
                 voiceMinutes: leveling?.voiceStats?.totalMinutes || 0,
                 attachmentCount: leveling?.attachmentCount || 0,
