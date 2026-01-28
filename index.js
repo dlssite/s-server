@@ -55,15 +55,20 @@ app.use('/api/auth', createProxyMiddleware({
         '^/': '/api/v1/auth/' // Prepend /api/v1/auth/ to the relative path
     },
     onProxyReq: (proxyReq, req, res) => {
-        // Forward cookies to auth service
+        console.log(`[Proxy] Forwarding to Auth Service: ${req.method} ${req.url}`);
+        // Log if cookies are present (don't log the content for security)
         if (req.headers.cookie) {
+            console.log(`[Proxy] 🍪 Found cookies in request from browser`);
             proxyReq.setHeader('cookie', req.headers.cookie);
+        } else {
+            console.warn(`[Proxy] ⚠️ No cookies found in request to ${req.url}`);
         }
     },
     onProxyRes: (proxyRes, req, res) => {
         // Forward set-cookie headers from auth service
         const setCookie = proxyRes.headers['set-cookie'];
         if (setCookie) {
+            console.log(`[Proxy] 📥 Received Set-Cookie from Auth Service`);
             res.setHeader('set-cookie', setCookie);
         }
     }
